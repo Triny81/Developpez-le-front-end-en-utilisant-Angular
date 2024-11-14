@@ -1,1 +1,40 @@
-/* You can add global styles to this file, and also import other style files */
+$color-turquoise: rgb(11, 134, 122);
+
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+}
+
+.center-col-items {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-row-items {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.box-rempli-turquoise {
+    margin: 0.5%;
+    background: $color-turquoise;
+    color: white;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+
+.box-entoure-turquoise {
+    margin: 1%;
+    border: solid;
+    border-color: $color-turquoise;
+    border-width: 2px;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
