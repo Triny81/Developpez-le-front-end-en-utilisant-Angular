@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Observable, of, take } from 'rxjs';
 import { OlympicService } from 'src/app/core/services/olympic.service';
 import { Color, LegendPosition, NgxChartsModule, ScaleType } from '@swimlane/ngx-charts';
+import { Olympic } from 'src/app/core/models/Olympic';
+import { Participation } from 'src/app/core/models/Participation';
+import { Router } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-home',
@@ -12,17 +16,17 @@ export class HomeComponent implements OnInit {
   public olympics$: Observable<any> = of(null);
 
   protected yearsJO: number[] = [];
-  protected pieDatas: any[] = [];
-  protected view: [number, number] = [800, 800];
+  protected olympics: Olympic[] = [];
+  protected pieDatas: any[] = []; // tableau pour afficher les résultats sur le diagramme
 
   // options
   protected gradient: boolean = false;
   protected showLegend: boolean = false;
   protected showLabels: boolean = true;
   protected isDoughnut: boolean = false;
-  protected legendPosition: LegendPosition  = LegendPosition.Below;
+  protected legendPosition: LegendPosition = LegendPosition.Below;
 
-  constructor(private olympicService: OlympicService) {
+  constructor(private olympicService: OlympicService, private router: Router, private cdRef: ChangeDetectorRef) {
     Object.assign(this, this.pieDatas);
   }
 
@@ -34,47 +38,45 @@ export class HomeComponent implements OnInit {
       if (countries) {
         countries.forEach((country: any) => {
 
-          if (country["participations"]) { 
-            country["value"] = 0;
+          let ol: Olympic = new Olympic(country["id"], country["country"], []);
 
-            country["participations"].forEach((participation: any) => {
-
-              // recherche des années des JO
-              const year = participation["year"];
-              if (!this.yearsJO.includes(year)) {
-                this.yearsJO.push(participation["year"]);
-              }
-
-              // médailles par pays
-              country["value"] += participation["medalsCount"];
-            });
-          }
-
-          // formatage des données pour ngx charts
           country["name"] = country["country"];
-          
-          this.pieDatas.push(country);
-          this.pieDatas = [...this.pieDatas]
-        });
+          country["value"] = 0;
 
-        // console.log("countries", this.pieDatas);
+          country["participations"].forEach((participation: any) => {
+
+            // recherche des années des JO
+            const year = participation["year"];
+            if (!this.yearsJO.includes(year)) {
+              this.yearsJO.push(participation["year"]);
+            }
+
+            ol.addParticipation(new Participation(participation["id"], year, participation["city"], participation["medalsCount"], participation["athleteCount"]));
+
+            // médailles par pays
+            country["value"] += participation["medalsCount"];
+          });
+
+          this.pieDatas.push(country);
+          this.olympics.push(ol);
+
+          this.pieDatas = [...this.pieDatas];
+        });
       }
     });
-    
-    
- 
   }
 
+  onSelect(country: any): void { // rediriger l'utilisateur quand il clique sur un pays du diagramme
+    const countryFound = this.olympics.find((ol) => ol.getName() === country["name"]);
 
-  onSelect(data: any): void { // rediriger l'utilisateur quand il clique sur un pays du diagramme
-    console.log('Item clicked', JSON.parse(JSON.stringify(data)));
+    if (countryFound) {
+      this.router.navigate(['/', 'detail', countryFound.getId()]);
+    } else {
+      alert("Country not found");
+    }
   }
 
-  onActivate(data: any): void {
-    // console.log('Activate', JSON.parse(JSON.stringify(data)));
-  }
-
-  onDeactivate(data: any): void {
-    // console.log('Deactivate', JSON.parse(JSON.stringify(data)));
+  ngAfterViewChecked() { // pour éviter les erreurs de changement de taille d'écran des graphiques
+    this.cdRef.detectChanges();
   }
 }
