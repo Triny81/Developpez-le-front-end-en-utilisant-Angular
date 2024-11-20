@@ -5,7 +5,6 @@ import { Color, LegendPosition, NgxChartsModule, ScaleType } from '@swimlane/ngx
 import { Olympic } from 'src/app/core/models/Olympic';
 import { Participation } from 'src/app/core/models/Participation';
 import { Router } from '@angular/router';
-import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-home',
@@ -26,7 +25,7 @@ export class HomeComponent implements OnInit {
   protected isDoughnut: boolean = false;
   protected legendPosition: LegendPosition = LegendPosition.Below;
 
-  constructor(private olympicService: OlympicService, private router: Router, private cdRef: ChangeDetectorRef) {
+  constructor(private olympicService: OlympicService, private router: Router) {
     Object.assign(this, this.pieDatas);
   }
 
@@ -42,6 +41,7 @@ export class HomeComponent implements OnInit {
 
           country["name"] = country["country"];
           country["value"] = 0;
+          country["extra"] = {"id": country["id"]}; // tableau "extra" pour pouvoir ajouter des données supplémentaires autre que name et value
 
           country["participations"].forEach((participation: any) => {
 
@@ -67,16 +67,6 @@ export class HomeComponent implements OnInit {
   }
 
   onSelect(country: any): void { // rediriger l'utilisateur quand il clique sur un pays du diagramme
-    const countryFound = this.olympics.find((ol) => ol.getName() === country["name"]);
-
-    if (countryFound) {
-      this.router.navigate(['/', 'detail', countryFound.getId()]);
-    } else {
-      alert("Country not found");
-    }
-  }
-
-  ngAfterViewChecked() { // pour éviter les erreurs de changement de taille d'écran des graphiques
-    this.cdRef.detectChanges();
+    this.router.navigate(['/', 'detail', country["extra"]["id"]]);
   }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { Olympic } from 'src/app/core/models/Olympic';
@@ -20,16 +20,16 @@ export class DetailComponent implements OnInit {
   protected datasGraph: any[] = [];
 
   // options
-  legend: boolean = false;
-  showLabels: boolean = false;
-  xAxis: boolean = true;
-  yAxis: boolean = true;
-  showYAxisLabel: boolean = true;
-  showXAxisLabel: boolean = true;
-  xAxisLabel: string = 'Year';
-  yAxisLabel: string = 'Number of medals';
+  protected legend: boolean = false;
+  protected showLabels: boolean = false;
+  protected xAxis: boolean = true;
+  protected yAxis: boolean = true;
+  protected showYAxisLabel: boolean = true;
+  protected showXAxisLabel: boolean = true;
+  protected xAxisLabel: string = 'Year';
+  protected yAxisLabel: string = 'Number of medals';
 
-  constructor(private olympicService: OlympicService, private router: Router, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
+  constructor(private olympicService: OlympicService, private router: Router, private route: ActivatedRoute) {
 
   }
 
@@ -76,15 +76,15 @@ export class DetailComponent implements OnInit {
             break; // dès que le pays concerné est trouvé, plus besoin de parcourir la boucle inutilement
           }
         }
+
+        if (!this.olympic) { // redirection vers la page not found si l'olympic n'est pas trouvé avec son id
+          this.router.navigate(['/page-not-found']);
+        } 
       }
     });
   }
 
   goHome(): void {
     this.router.navigate(['/']);
-  }
-
-  ngAfterViewChecked() { // pour éviter les erreurs de changement de taille d'écran des graphiques
-    this.cdRef.detectChanges();
   }
 }

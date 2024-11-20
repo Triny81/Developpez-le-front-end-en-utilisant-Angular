@@ -5,6 +5,6 @@ Comment lancer l'application ?
 
 Fonctionnement global de l'application
 - 2 components sont utilisés : 1 pour la page d'accueil et l'autre pour le détail d'un pays.
-- Chacun de ces component crée un objet Olympic ainsi qu'un tableau qui sont tous deux utilisés pour afficher les données dans les graphiques.
+- Chacun de ces components crée un objet Olympic ainsi qu'un tableau qui sont tous deux utilisés pour afficher les données dans les graphiques.
 - Les graphiques utilisés viennent de l'outil ngx-charts. Lien : https://swimlane.gitbook.io/ngx-charts
-- Les pages sont responsives grâce à des éléments créés globalement pour pouvoir les réutiliser.
+- Les pages sont responsives grâce à des éléments css créés globalement pour pouvoir les réutiliser dans de futures pages.
