@@ -12,11 +12,17 @@ import { Router } from '@angular/router';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  public olympics$: Observable<any> = of(null);
+  public olympics$!: Observable<Olympic[]>;
 
   protected yearsJO: number[] = [];
-  protected olympics: Olympic[] = [];
-  protected pieDatas: any[] = []; // tableau pour afficher les résultats sur le diagramme
+  protected pieDatas: Array<{ 
+    name: string; 
+    value: number; 
+    extra: { id: number; }; 
+  }> = [];  // tableau pour afficher les résultats sur le diagramme
+
+  protected view!: [number, number];
+  private heightGraph: number = 400;
 
   // options
   protected gradient: boolean = false;
@@ -26,24 +32,28 @@ export class HomeComponent implements OnInit {
   protected legendPosition: LegendPosition = LegendPosition.Below;
 
   constructor(private olympicService: OlympicService, private router: Router) {
+    this.view = [innerWidth, this.heightGraph];
     Object.assign(this, this.pieDatas);
   }
 
   ngOnInit(): void {
     this.olympics$ = this.olympicService.getOlympics();
 
-    this.olympics$.subscribe(countries => {
+    this.olympics$.subscribe(olympics => {
 
-      if (countries) {
-        countries.forEach((country: any) => {
+      if (olympics) {
 
-          let ol: Olympic = new Olympic(country["id"], country["country"], []);
+        for (let i = 0; i < olympics.length; i++) {
+          const olympic = olympics[i]; 
 
-          country["name"] = country["country"];
-          country["value"] = 0;
-          country["extra"] = {"id": country["id"]}; // tableau "extra" pour pouvoir ajouter des données supplémentaires autre que name et value
+          let pieElement = {
+            "name": olympic["country"],
+            "value": 0,
+            "extra": { "id": olympic["id"] } // tableau "extra" pour pouvoir ajouter des données supplémentaires autre que name et value
+          };
 
-          country["participations"].forEach((participation: any) => {
+          for (let j = 0; j < olympic["participations"].length; j++) {
+            const participation = olympic["participations"][j];
 
             // recherche des années des JO
             const year = participation["year"];
@@ -51,22 +61,25 @@ export class HomeComponent implements OnInit {
               this.yearsJO.push(participation["year"]);
             }
 
-            ol.addParticipation(new Participation(participation["id"], year, participation["city"], participation["medalsCount"], participation["athleteCount"]));
+            pieElement["value"] += participation["medalsCount"]; // médailles par pays
+          }
 
-            // médailles par pays
-            country["value"] += participation["medalsCount"];
-          });
-
-          this.pieDatas.push(country);
-          this.olympics.push(ol);
-
-          this.pieDatas = [...this.pieDatas];
-        });
+          this.pieDatas.push(pieElement);
+        }
+  
+        this.pieDatas = [...this.pieDatas]; // afficher les pays dans le graphique
       }
     });
   }
 
-  onSelect(country: any): void { // rediriger l'utilisateur quand il clique sur un pays du diagramme
-    this.router.navigate(['/', 'detail', country["extra"]["id"]]);
+  onSelect(olympicId: number): void { // rediriger l'utilisateur vers le détail du pays quand il clique sur un pays du diagramme
+    this.router.navigate(['/', 'detail', olympicId]);
+  }
+
+  onResize(event: Event): void { // rendimensionnement du graphique pour la responsivité
+    let window = event.target as Window;
+    if (window) {
+      this.view = [window.innerWidth, this.heightGraph];
+    }
   }
 }

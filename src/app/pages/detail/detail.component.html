@@ -1,5 +1,5 @@
 <div #containerRef class="center-col-items" *ngIf="olympic">
-  <div class="box-rempli-turquoise center-items">{{olympic.getName()}}</div>
+  <div class="box-rempli-turquoise center-items">{{olympic.getCountry()}}</div>
   <div class="center-row-items">
     <div class="box-entoure-turquoise center-col-items">Number of entries <b>{{olympic.getParticipations().length}}</b></div>
     <div class="box-entoure-turquoise center-col-items">Total number of medals <b>{{nbTotalMedals}}</b></div>
@@ -7,7 +7,7 @@
   </div>
 
   <ngx-charts-line-chart
-    [view]="[containerRef.offsetWidth, 300]"
+    [view]="view"
     [legend]="legend"
     [showXAxisLabel]="showXAxisLabel"
     [showYAxisLabel]="showYAxisLabel"
@@ -16,6 +16,7 @@
     [xAxisLabel]="xAxisLabel"
     [yAxisLabel]="yAxisLabel"
     [results]="datasGraph"
+    (window:resize)="onResize($event)"
   >
   </ngx-charts-line-chart>
 

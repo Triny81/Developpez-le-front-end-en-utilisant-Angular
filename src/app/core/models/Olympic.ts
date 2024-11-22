@@ -2,12 +2,12 @@ import { Participation } from "./Participation";
 
 export class Olympic {
     private id: number;
-    private name: string;
+    private country: string;
     private participations : Participation[];
 
-    constructor(id: number, name: string, participations : Participation[]) {
+    constructor(id: number, country: string, participations : Participation[]) {
         this.id = id;
-        this.name = name;
+        this.country = country;
         this.participations = participations;
     }
 
@@ -23,12 +23,12 @@ export class Olympic {
         this.id = id;
     }
 
-    public getName(): string {
-        return this.name;
+    public getCountry(): string {
+        return this.country;
     }
 
-    public setName(name: string): void {
-        this.name = name;
+    public setCountry(country: string): void {
+        this.country = country;
     }
 
     public getParticipations(): Participation[] {

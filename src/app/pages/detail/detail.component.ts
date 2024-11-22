@@ -12,12 +12,18 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
   styleUrl: './detail.component.scss'
 })
 export class DetailComponent implements OnInit {
-  public olympics$: Observable<any> = of(null);
-
+  public olympics$!: Observable<Olympic[]>;
+ 
   protected olympic!: Olympic;
   protected nbTotalMedals: number = 0;
   protected nbTotalAtheltes: number = 0;
-  protected datasGraph: any[] = [];
+  protected datasGraph: Array<{ 
+    name: string; 
+    series: Array<{ name: string; value: number }> 
+  }> = []; // tableau pour afficher les résultats sur le diagramme
+
+  protected view!: [number, number];
+  private heightGraph: number = 300;
 
   // options
   protected legend: boolean = false;
@@ -30,48 +36,51 @@ export class DetailComponent implements OnInit {
   protected yAxisLabel: string = 'Number of medals';
 
   constructor(private olympicService: OlympicService, private router: Router, private route: ActivatedRoute) {
-
+    this.view = [innerWidth, this.heightGraph];
   }
 
   ngOnInit(): void {
     const olympicId = this.route.snapshot.params['id'];
     this.olympics$ = this.olympicService.getOlympics();
 
-    this.olympics$.subscribe(countries => {
+    this.olympics$.subscribe(olympics => {
 
-      if (countries) { // récupération du seul olympic qui nous intéresse dans la page détail
+      if (olympics) {
 
-        for (let i = 0; i < countries.length; i++) {
-          const country = countries[i];
+        for (let i = 0; i < olympics.length; i++) {
+          const olympic = olympics[i];
 
-          if (olympicId == country["id"]) {
+          if (olympicId == olympic["id"]) { // récupération du seul olympic qui nous intéresse dans la page détail
+
             let participations: Participation[] = [];
 
-            country["participations"].forEach((participation: any) => {
+            olympic["participations"].forEach((participation: Participation) => {
               participations.push(new Participation(participation["id"], participation["year"], participation["city"], participation["medalsCount"], participation["athleteCount"]));
             });
 
             participations.sort((a, b) => a.getYear() - b.getYear()); // tri croissant des participations par année
-
-            this.olympic = new Olympic(country["id"], country["country"], participations);
+          
+            this.olympic = new Olympic(olympic["id"], olympic["country"], olympic["participations"]);
 
             // données pour le graphique
             this.datasGraph[0] =
             {
-              "name": this.olympic.getName(),
+              "name": this.olympic.getCountry(),
               "series": []
             };
 
-            participations.forEach(pa => {
+            for (let j = 0; j < participations.length; j++) {
+              const participation = participations[j];
+
               this.datasGraph[0]["series"].push(
                 {
-                  "name": pa.getYear() + "", // bien penser à mettre une chaine de caractère et non un nombre sinon les années auront des décimales
-                  "value": pa.getMedalsCount()
+                  "name": participation.getYear() + "", // bien penser à mettre une chaine de caractère et non un nombre sinon les années auront des décimales
+                  "value": participation.getMedalsCount()
                 });
 
-              this.nbTotalMedals += pa.getMedalsCount();
-              this.nbTotalAtheltes += pa.getAthleteCount();
-            });
+              this.nbTotalMedals += participation.getMedalsCount();
+              this.nbTotalAtheltes += participation.getAthleteCount();
+            }
 
             break; // dès que le pays concerné est trouvé, plus besoin de parcourir la boucle inutilement
           }
@@ -86,5 +95,12 @@ export class DetailComponent implements OnInit {
 
   goHome(): void {
     this.router.navigate(['/']);
+  }
+
+  onResize(event: Event): void { // rendimensionnement du graphique pour la responsivité
+    let window = event.target as Window;
+    if (window) {
+      this.view = [window.innerWidth, this.heightGraph];
+    }
   }
 }

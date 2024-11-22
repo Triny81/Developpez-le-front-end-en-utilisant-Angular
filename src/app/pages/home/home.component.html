@@ -6,7 +6,7 @@
   </div>
 
    <ngx-charts-pie-chart
-    [view]="[containerRef.offsetWidth, 400]"
+    [view]="view"
     [results]="pieDatas"
     [gradient]="gradient"
     [legend]="showLegend"
@@ -14,7 +14,8 @@
     [labels]="showLabels"
     [doughnut]="isDoughnut"
     [trimLabels]="false"
-    (select)="onSelect($event)"
+    (select)="onSelect($event['extra']['id'])"
+    (window:resize)="onResize($event)"
     >
   </ngx-charts-pie-chart> 
 </div>
