@@ -44,9 +44,8 @@ export class DetailComponent implements OnInit {
     this.olympics$ = this.olympicService.getOlympics();
 
     this.olympics$.subscribe(olympics => {
-
-      if (olympics) {
-
+      if (olympics.length > 0) {
+    
         for (let i = 0; i < olympics.length; i++) {
           const olympic = olympics[i];
 
