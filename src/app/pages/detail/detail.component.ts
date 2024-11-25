@@ -99,7 +99,7 @@ export class DetailComponent implements OnInit {
   onResize(event: Event): void { // rendimensionnement du graphique pour la responsivité
     let window = event.target as Window;
     if (window) {
-      this.view = [window.innerWidth, this.heightGraph];
+      this.view = [window.outerWidth, this.heightGraph];
     }
   }
 }
