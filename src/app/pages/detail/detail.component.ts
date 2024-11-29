@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { Olympic } from 'src/app/core/models/Olympic';
@@ -13,13 +13,13 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 })
 export class DetailComponent implements OnInit {
   public olympics$!: Observable<Olympic[]>;
- 
+
   protected olympic!: Olympic;
   protected nbTotalMedals: number = 0;
   protected nbTotalAtheltes: number = 0;
-  protected datasGraph: Array<{ 
-    name: string; 
-    series: Array<{ name: string; value: number }> 
+  protected datasGraph: Array<{
+    name: string;
+    series: Array<{ name: string; value: number }>
   }> = []; // tableau pour afficher les résultats sur le diagramme
 
   protected view!: [number, number];
@@ -36,7 +36,7 @@ export class DetailComponent implements OnInit {
   protected yAxisLabel: string = 'Number of medals';
 
   constructor(private olympicService: OlympicService, private router: Router, private route: ActivatedRoute) {
-    this.view = [innerWidth, this.heightGraph];
+    this.view = [this.reziseWidthGraph(innerWidth), this.heightGraph];
   }
 
   ngOnInit(): void {
@@ -45,7 +45,7 @@ export class DetailComponent implements OnInit {
 
     this.olympics$.subscribe(olympics => {
       if (olympics.length > 0) {
-    
+
         for (let i = 0; i < olympics.length; i++) {
           const olympic = olympics[i];
 
@@ -58,7 +58,7 @@ export class DetailComponent implements OnInit {
             });
 
             participations.sort((a, b) => a.getYear() - b.getYear()); // tri croissant des participations par année
-          
+
             this.olympic = new Olympic(olympic["id"], olympic["country"], olympic["participations"]);
 
             // données pour le graphique
@@ -87,7 +87,7 @@ export class DetailComponent implements OnInit {
 
         if (!this.olympic) { // redirection vers la page not found si l'olympic n'est pas trouvé avec son id
           this.router.navigate(['/page-not-found']);
-        } 
+        }
       }
     });
   }
@@ -98,8 +98,22 @@ export class DetailComponent implements OnInit {
 
   onResize(event: Event): void { // rendimensionnement du graphique pour la responsivité
     let window = event.target as Window;
+
     if (window) {
-      this.view = [window.outerWidth, this.heightGraph];
+      this.view = [this.reziseWidthGraph(window.outerWidth), this.heightGraph];
     }
+  }
+
+  reziseWidthGraph(width: number): number {
+    
+    if (width >= 1440) {
+      width /= 2.6;
+    } else if (width >= 1020) {
+      width /= 1.6;
+    } else if (width >= 768) {
+      width /= 1.3;
+    }
+
+    return width;
   }
 }

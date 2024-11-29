@@ -1,4 +1,4 @@
-<div #containerRef class="center-col-items" *ngIf="olympic">
+<div class="center-col-items" *ngIf="olympic">
   <div class="box-rempli-turquoise center-items">{{olympic.getCountry()}}</div>
   <div class="center-row-items">
     <div class="box-entoure-turquoise center-col-items">Number of entries <b>{{olympic.getParticipations().length}}</b></div>
@@ -6,18 +6,18 @@
     <div class="box-entoure-turquoise center-col-items">Total number of athletes <b>{{nbTotalAtheltes}}</b></div>
   </div>
 
-  <ngx-charts-line-chart
-    [view]="view"
-    [legend]="legend"
-    [showXAxisLabel]="showXAxisLabel"
-    [showYAxisLabel]="showYAxisLabel"
-    [xAxis]="xAxis"
-    [yAxis]="yAxis"
-    [xAxisLabel]="xAxisLabel"
-    [yAxisLabel]="yAxisLabel"
-    [results]="datasGraph"
-    (window:resize)="onResize($event)"
-  >
+    <ngx-charts-line-chart
+      [view]="view"
+      [legend]="legend"
+      [showXAxisLabel]="showXAxisLabel"
+      [showYAxisLabel]="showYAxisLabel"
+      [xAxis]="xAxis"
+      [yAxis]="yAxis"
+      [xAxisLabel]="xAxisLabel"
+      [yAxisLabel]="yAxisLabel"
+      [results]="datasGraph"
+      (window:resize)="onResize($event)"
+    >
   </ngx-charts-line-chart>
 
   <button class="back-btn box-rempli-grey" type="button" (click)="goHome()">Go back</button>
